@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { MapPin, Bed, Bath } from 'lucide-react'
+import FavoriteButton from './FavoriteButton'
 
 export interface ListingPopupData {
     id: number | string
@@ -29,6 +30,9 @@ export default function ListingPopup({ listing, onClose }: ListingPopupProps) {
                     className="object-cover"
                     sizes="280px"
                 />
+                <div className="absolute top-2 left-2 z-10">
+                    <FavoriteButton listingId={String(listing.id)} size={18} />
+                </div>
                 <button
                     onClick={onClose}
                     className="absolute top-2 right-2 w-6 h-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-500 hover:text-gray-900 transition-colors text-xs font-bold shadow-sm"

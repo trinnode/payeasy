@@ -8,6 +8,7 @@ import type { MapListing } from '../../components/MapView'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { MapPin, Bed, Bath, UserCircle } from 'lucide-react'
+import FavoriteButton from '../../components/FavoriteButton'
 
 // Types for Mock Data
 type Property = {
@@ -320,6 +321,9 @@ export default function BrowsePage() {
                                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                 />
+                                                <div className="absolute top-3 left-3 z-10">
+                                                    <FavoriteButton listingId={String(property.id)} />
+                                                </div>
                                                 <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-semibold text-gray-900 shadow-sm z-10">
                                                     {property.type}
                                                 </div>

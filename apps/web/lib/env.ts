@@ -45,10 +45,22 @@ const parsedEnv = isServer
   : clientSchema.safeParse(getEnvVars());
 
 if (!parsedEnv.success) {
-  console.error("❌ Invalid environment variables:", parsedEnv.error.flatten().fieldErrors);
-  throw new Error("Invalid environment variables");
+  console.warn("⚠️  Missing environment variables:", parsedEnv.error.flatten().fieldErrors);
+  console.warn("⚠️  Running with defaults — Supabase features will not work.");
 }
 
-export const env = isServer
-  ? (parsedEnv.data as z.infer<typeof envSchema>)
-  : (parsedEnv.data as z.infer<typeof clientSchema> & Partial<z.infer<typeof serverSchema>>);
+const fallback = {
+  SUPABASE_SERVICE_ROLE_KEY: "",
+  DATABASE_URL: "",
+  NODE_ENV: "development" as const,
+  NEXT_PUBLIC_SUPABASE_URL: "",
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: "",
+  NEXT_PUBLIC_STELLAR_NETWORK: "testnet",
+  NEXT_PUBLIC_FREIGHTER_NETWORK: "testnet",
+};
+
+export const env = parsedEnv.success
+  ? isServer
+    ? (parsedEnv.data as z.infer<typeof envSchema>)
+    : (parsedEnv.data as z.infer<typeof clientSchema> & Partial<z.infer<typeof serverSchema>>)
+  : fallback;
