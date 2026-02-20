@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import FilterSidebar from '../../components/FilterSidebar'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 import ViewToggle from '../../components/ViewToggle'
 import MapView from '../../components/MapView'
 import type { MapListing } from '../../components/MapView'
-import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import { MapPin, Bed, Bath, UserCircle } from 'lucide-react'
 import FavoriteButton from '../../components/FavoriteButton'
@@ -114,6 +115,7 @@ export default function BrowsePage() {
 
     // Derived state from URL params to filter the mock data
     const [filteredProperties, setFilteredProperties] = useState<Property[]>(MOCK_PROPERTIES)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     // Bbox state for map view client-side filtering
     const [mapBbox, setMapBbox] = useState<[number, number, number, number] | null>(null)
@@ -263,11 +265,31 @@ export default function BrowsePage() {
                         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">P</div>
                         <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">PayEasy Browse</h1>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm font-medium text-gray-600 hidden sm:block">Demo User</span>
-                        <div className="w-9 h-9 bg-gray-100 rounded-full border border-gray-200 flex items-center justify-center text-gray-400">
-                            <UserCircle size={20} />
+                    <div 
+                        className="relative"
+                        onMouseEnter={() => setIsDropdownOpen(true)}
+                        onMouseLeave={() => setIsDropdownOpen(false)}
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                        <div className="flex items-center gap-4 cursor-pointer">
+                            <span className="text-sm font-medium text-gray-600 hidden sm:block">Demo User</span>
+                            <div className="w-9 h-9 bg-gray-100 rounded-full border border-gray-200 flex items-center justify-center text-gray-400">
+                                <UserCircle size={20} />
+                            </div>
                         </div>
+                        
+                        {isDropdownOpen && (
+                            <div className="absolute right-0 top-full pt-2 w-48 z-50">
+                                <div className="bg-white rounded-md shadow-lg py-1 border border-gray-100">
+                                    <Link href="/auth/login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Login
+                                    </Link>
+                                    <Link href="/auth/register" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Register
+                                    </Link>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </header>

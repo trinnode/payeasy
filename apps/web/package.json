@@ -13,6 +13,7 @@
         "build:contract": "cd ../../contracts/rent-escrow && soroban contract build"
     },
     "dependencies": {
+        "@hookform/resolvers": "^5.2.2",
         "@radix-ui/react-slider": "^1.3.6",
         "@stellar/freighter-api": "^1.5.0",
         "@supabase/ssr": "^0.8.0",
@@ -26,8 +27,10 @@
         "lucide-react": "^0.294.0",
         "mapbox-gl": "^3.18.1",
         "next": "14.0.3",
+        "nextjs-toploader": "^3.9.17",
         "react": "^18",
         "react-dom": "^18",
+        "react-hook-form": "^7.71.1",
         "react-map-gl": "^7.1.9",
         "react-select": "^5.10.2",
         "stellar-sdk": "^11.0.0",
