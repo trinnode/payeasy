@@ -1,22 +1,22 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
+import "../lib/env";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import FavoritesProvider from "@/components/FavoritesProvider";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-    title: 'PayEasy | Shared Rent on Stellar',
-    description: 'Secure, blockchain-powered rent sharing.',
-}
+  title: "PayEasy | Shared Rent on Stellar",
+  description: "Secure, blockchain-powered rent sharing.",
+};
 
-export default function RootLayout({
-    children,
-}: {
-    children: React.ReactNode
-}) {
-    return (
-        <html lang="en">
-            <body className={`${inter.className} bg-slate-950 text-white min-h-screen`}>{children}</body>
-        </html>
-    )
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className={`${inter.className} min-h-screen bg-slate-950 text-white`}>
+        <FavoritesProvider>{children}</FavoritesProvider>
+      </body>
+    </html>
+  );
 }
