@@ -22,3 +22,7 @@ export function getSupabaseClient() {
   }
   return browserClient;
 }
+
+export function resetClientInstance() {
+  browserClient = null;
+}
