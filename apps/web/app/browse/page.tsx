@@ -1,7 +1,14 @@
+/**
+ * @file browse/page.tsx
+ * @description Mobile-first property browse page with touch-optimized interactions
+ */
+
 'use client'
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import FilterSidebar from '../../components/FilterSidebar'
+import MobileMenu from '../../components/MobileMenu'
+import MobileFilterDrawer from '../../components/MobileFilterDrawer'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import ViewToggle from '../../components/ViewToggle'
@@ -256,72 +263,104 @@ export default function BrowsePage() {
         })
     }, [searchParams])
 
+    // Count active filters for mobile badge
+    const activeFilterCount = useMemo(() => {
+        if (!searchParams) return 0;
+        let count = 0;
+        if (searchParams.get('minPrice') && Number(searchParams.get('minPrice')) > 0) count++;
+        if (searchParams.get('maxPrice') && Number(searchParams.get('maxPrice')) < 5000) count++;
+        if (searchParams.get('bedrooms')) count++;
+        if (searchParams.get('bathrooms')) count++;
+        if (searchParams.get('furnished')) count++;
+        if (searchParams.get('petFriendly')) count++;
+        if (searchParams.get('amenities')) count++;
+        if (searchParams.get('location')) count++;
+        return count;
+    }, [searchParams]);
+
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
-            {/* Header */}
+            {/* Header - Mobile-first with touch targets */}
             <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">P</div>
-                        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">PayEasy Browse</h1>
-                    </div>
-                    <div 
-                        className="relative"
-                        onMouseEnter={() => setIsDropdownOpen(true)}
-                        onMouseLeave={() => setIsDropdownOpen(false)}
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    >
-                        <div className="flex items-center gap-4 cursor-pointer">
-                            <span className="text-sm font-medium text-gray-600 hidden sm:block">Demo User</span>
-                            <div className="w-9 h-9 bg-gray-100 rounded-full border border-gray-200 flex items-center justify-center text-gray-400">
-                                <UserCircle size={20} />
-                            </div>
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center gap-2 min-h-touch-sm">
+                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
+                            P
                         </div>
-                        
-                        {isDropdownOpen && (
-                            <div className="absolute right-0 top-full pt-2 w-48 z-50">
-                                <div className="bg-white rounded-md shadow-lg py-1 border border-gray-100">
-                                    <Link href="/auth/login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Login
-                                    </Link>
-                                    <Link href="/auth/register" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                        Register
-                                    </Link>
+                        <h1 className="text-base sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+                            PayEasy <span className="hidden sm:inline">Browse</span>
+                        </h1>
+                    </Link>
+
+                    {/* Desktop User Menu */}
+                    <div className="hidden lg:flex items-center gap-4">
+                        <div 
+                            className="relative"
+                            onMouseEnter={() => setIsDropdownOpen(true)}
+                            onMouseLeave={() => setIsDropdownOpen(false)}
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        >
+                            <div className="flex items-center gap-4 cursor-pointer min-h-touch-sm">
+                                <span className="text-sm font-medium text-gray-600">Demo User</span>
+                                <div className="w-10 h-10 bg-gray-100 rounded-full border border-gray-200 flex items-center justify-center text-gray-400">
+                                    <UserCircle size={20} />
                                 </div>
                             </div>
-                        )}
+                            
+                            {isDropdownOpen && (
+                                <div className="absolute right-0 top-full pt-2 w-48 z-50">
+                                    <div className="bg-white rounded-md shadow-lg py-1 border border-gray-100">
+                                        <Link href="/auth/login" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 min-h-touch-sm">
+                                            Login
+                                        </Link>
+                                        <Link href="/auth/register" className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 min-h-touch-sm">
+                                            Register
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
+                    {/* Mobile Menu */}
+                    <MobileMenu isAuthenticated={false} />
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Sidebar Area */}
-                    <aside className="w-full lg:w-80 flex-shrink-0">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 pb-24 lg:pb-8">
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                    {/* Sidebar Area - Desktop only */}
+                    <aside className="hidden lg:block w-80 flex-shrink-0">
                         <div className="sticky top-24">
                             <FilterSidebar />
                         </div>
                     </aside>
 
+                    {/* Mobile Filter Drawer */}
+                    <MobileFilterDrawer filterCount={activeFilterCount} />
+
                     {/* Main Content Area */}
                     <div className="flex-1">
 
-                        {/* Results Count, Sort & View Toggle */}
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-lg font-semibold text-gray-900">
-                                {filteredProperties.length} Properties Found
+                        {/* Results Count, Sort & View Toggle - Mobile-optimized */}
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                            <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                                <span className="text-primary">{filteredProperties.length}</span>
+                                <span className="hidden xs:inline"> Properties</span>
+                                <span className="xs:hidden"> Found</span>
                             </h2>
-                            <div className="flex items-center gap-4">
-                                <div className="text-sm text-gray-500 hidden sm:block">
-                                    Sort by: <span className="font-medium text-gray-900 cursor-pointer hover:text-primary transition-colors">Recommended</span>
+                            <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                                <div className="text-xs sm:text-sm text-gray-500 hidden md:block">
+                                    Sort: <span className="font-medium text-gray-900 cursor-pointer hover:text-primary transition-colors">Recommended</span>
                                 </div>
                                 <ViewToggle view={viewMode} onChange={handleViewChange} />
                             </div>
                         </div>
 
-                        {/* Conditional: Grid View or Map View */}
+                        {/* Conditional: Grid View or Map View - Mobile-optimized heights */}
                         {viewMode === 'map' ? (
-                            <div className="h-[400px] lg:h-[calc(100vh-12rem)] rounded-xl overflow-hidden border border-gray-200">
+                            <div className="h-[60vh] sm:h-[500px] lg:h-[calc(100vh-12rem)] rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 shadow-mobile">
                                 <MapView
                                     listings={mapListings}
                                     initialViewState={initialViewState}
@@ -330,8 +369,8 @@ export default function BrowsePage() {
                                 />
                             </div>
                         ) : (
-                            /* Property Grid */
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            /* Property Grid - Mobile-first columns */
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
                                 {filteredProperties.length > 0 ? (
                                     filteredProperties.map((property) => (
                                         <Link href={`/listings/${property.id}`} key={property.id} className="block group h-full">
