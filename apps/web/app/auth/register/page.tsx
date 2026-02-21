@@ -1,5 +1,8 @@
 'use client';
 
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -17,7 +20,26 @@ import FormError from '@/components/forms/FormError';
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | undefined>('');
-  const { isConnected, publicKey: walletPublicKey, connect, isInitializing: isWalletConnecting } = useWallet();
+  
+  let isConnected: boolean
+  let walletPublicKey: string | null
+  let connect: () => Promise<void>
+  let isWalletConnecting: boolean
+  
+  try {
+    const wallet = useWallet()
+    isConnected = wallet.isConnected
+    walletPublicKey = wallet.publicKey
+    connect = wallet.connect
+    isWalletConnecting = wallet.isInitializing
+  } catch {
+    // During build, provider might not be available
+    isConnected = false
+    walletPublicKey = null
+    connect = async () => {}
+    isWalletConnecting = false
+  }
+  
   const supabase = createClient();
 
   const {

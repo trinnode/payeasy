@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerClient } from "@/lib/supabase/server";
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const listingId = params.id;
+    const { id: listingId } = await params;
     if (!listingId) {
       return NextResponse.json({ error: "Listing ID is required" }, { status: 400 });
     }
 
-    const supabase = getServerClient();
+    const supabase = await getServerClient();
 
     // Check if the user is authenticated
     const {

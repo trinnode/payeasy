@@ -2,12 +2,12 @@ import { type NextRequest } from "next/server";
 import { getUserId, successResponse, errorResponse } from "@/lib/api-utils";
 import { getServerClient } from "@/lib/supabase/server";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const idParam = params.id;
+    const { id: idParam } = await params;
 
     // Resolve user id: "me" -> auth cookie, otherwise the path param
-    const supabase = getServerClient();
+    const supabase = await getServerClient();
 
     let targetId: string | null = null;
     if (idParam === "me") {
@@ -58,10 +58,10 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const idParam = params.id;
-    const supabase = getServerClient();
+    const { id: idParam } = await params;
+    const supabase = await getServerClient();
 
     let targetId: string | null = null;
     if (idParam === "me") {

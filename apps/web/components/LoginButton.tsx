@@ -21,10 +21,6 @@ type LoginState =
 
 const STATUS_LABELS: Record<LoginState, string> = {
     idle: "Sign in with Stellar",
-    connecting: "Connecting...",
-    "requesting-challenge": "Requesting challenge...",
-    signing: "Please sign in wallet...",
-    verifying: "Verifying signature...",
     "requesting-challenge": "Requesting challenge…",
     signing: "Waiting for signature…",
     verifying: "Verifying…",
@@ -40,7 +36,6 @@ export default function LoginButton() {
     const { isConnected, publicKey, isInitializing, status: walletStatus, connect } = useWallet();
     const [state, setState] = useState<LoginState>("idle");
     const [error, setError] = useState<string | null>(null);
-    const [publicKey, setPublicKey] = useState<string | null>(null);
     const router = useRouter();
     const [signedInKey, setSignedInKey] = useState<string | null>(null);
 
@@ -116,7 +111,7 @@ export default function LoginButton() {
                 err instanceof Error ? err.message : "An unexpected error occurred."
             );
         }
-    }, [isConnected, publicKey, connect]);
+    }, [isConnected, publicKey, connect, router]);
 
     const isLoading = !["idle", "success", "error"].includes(state);
 

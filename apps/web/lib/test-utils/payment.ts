@@ -60,7 +60,6 @@ export const PaymentFactory = {
             status: 'pending',
             payment_period: `${year}-${month}`,
             stellar_ledger: null,
-            confirmed_at: null,
             ...overrides,
         };
     },
