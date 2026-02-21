@@ -11,7 +11,7 @@ import {
   type xdr,
 } from "stellar-sdk";
 import { getStellarNetworkConfig, type StellarNetworkName } from "@/lib/stellar/network";
-import type { ContractTransactionStatus } from "@/lib/types/superbase";
+import type { ContractTransactionStatus } from "@/lib/types/supabase";
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
@@ -131,9 +131,9 @@ function extractGasFromSimulation(simulation: {
   return {
     stroops: minResourceFee,
     source: "simulateTransaction",
-    cpuInstructions: Number(transactionData?.resources()?.instructions() ?? 0),
-    readBytes: Number(transactionData?.resources()?.readBytes() ?? 0),
-    writeBytes: Number(transactionData?.resources()?.writeBytes() ?? 0),
+    cpuInstructions: Number(transactionData?.resources?.()?.instructions?.() ?? 0),
+    readBytes: Number(transactionData?.resources?.()?.readBytes?.() ?? 0),
+    writeBytes: Number(transactionData?.resources?.()?.writeBytes?.() ?? 0),
   };
 }
 
@@ -205,7 +205,8 @@ export async function buildContractTransaction(
     .build();
 
   const simulation = await server.simulateTransaction(initialTransaction);
-  const simulationGasEstimate = extractGasFromSimulation(simulation);
+  const simulationGasEstimate =
+    "minResourceFee" in simulation ? extractGasFromSimulation(simulation) : null;
   const rpcGasEstimate = await estimateGasViaRpcMethod(rpcUrl, initialTransaction.toXDR());
 
   const rpcWithAssembler = SorobanRpc as unknown as {
@@ -251,13 +252,16 @@ export async function signContractTransaction(
       return signed;
     }
 
-    if (signed && typeof signed === "object") {
-      if ("error" in signed && typeof signed.error === "string" && signed.error.length > 0) {
-        throw new Error(signed.error);
+    // Cast signed to unknown to safely check properties on it
+    const signedObj = signed as unknown as Record<string, unknown>;
+
+    if (signedObj && typeof signedObj === "object") {
+      if ("error" in signedObj && typeof signedObj.error === "string" && signedObj.error.length > 0) {
+        throw new Error(signedObj.error);
       }
 
-      if ("signedTxXdr" in signed && typeof signed.signedTxXdr === "string") {
-        return signed.signedTxXdr;
+      if ("signedTxXdr" in signedObj && typeof signedObj.signedTxXdr === "string") {
+        return signedObj.signedTxXdr;
       }
     }
 
@@ -481,7 +485,7 @@ export async function getNetworkTransactionStatus(
     const tx = await horizonServer.transactions().transaction(transactionHash).call();
     return {
       status: tx.successful ? "success" : "failed",
-      ledger: tx.ledger,
+      ledger: tx.ledger_attr as number | undefined,
     };
   } catch {
     return {

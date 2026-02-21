@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { errorResponse, getUserId } from '@/lib/api-utils';
 import { upstashGet, upstashSet } from '../../../lib/recommendation/cache';
 
-import { createServerClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { getRecommendations } from '../../../lib/recommendation/engine';
 
 export async function GET (request: NextRequest) {
-    const supabase = createServerClient();
+    const supabase = createClient();
     const userId = getUserId(request);
     if (!userId) {
         return errorResponse("Authentication required.", 401, "UNAUTHORIZED");
@@ -19,10 +19,10 @@ export async function GET (request: NextRequest) {
     }
 
     // Fetch user data
-    const { data: userData } = await supabase
+    const { data: userData } = await (await supabase)
         .from('users')
         .select('*')
-        .eq('wallet_address', userId)
+        .eq('public_key', userId)
         .single();
 
     if (!userData) {

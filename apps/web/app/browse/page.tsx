@@ -13,7 +13,7 @@ import FavoriteButton from '../../components/FavoriteButton'
 
 // Types for Mock Data
 type Property = {
-    id: number
+    id: number | string
     title: string
     price: number
     location: string
@@ -27,7 +27,7 @@ type Property = {
 
 const MOCK_PROPERTIES: Property[] = [
     {
-        id: 1,
+        id: "mock-1",
         title: "Modern Loft in Downtown",
         price: 3200,
         location: "Miami, FL",
@@ -39,7 +39,7 @@ const MOCK_PROPERTIES: Property[] = [
         longitude: -80.1947,
     },
     {
-        id: 2,
+        id: "mock-2",
         title: "Cozy Studio near Beach",
         price: 1800,
         location: "Miami Beach, FL",
@@ -51,7 +51,7 @@ const MOCK_PROPERTIES: Property[] = [
         longitude: -80.1300,
     },
     {
-        id: 3,
+        id: "mock-3",
         title: "Luxury Penthouse Suite",
         price: 4500,
         location: "Brickell, FL",
@@ -63,7 +63,7 @@ const MOCK_PROPERTIES: Property[] = [
         longitude: -80.1936,
     },
     {
-        id: 4,
+        id: "mock-4",
         title: "Garden Apartment",
         price: 2400,
         location: "Coral Gables, FL",
@@ -75,7 +75,7 @@ const MOCK_PROPERTIES: Property[] = [
         longitude: -80.2684,
     },
     {
-        id: 5,
+        id: "mock-5",
         title: "Spacious Family Home",
         price: 3800,
         location: "Coconut Grove, FL",
@@ -87,7 +87,7 @@ const MOCK_PROPERTIES: Property[] = [
         longitude: -80.2409,
     },
     {
-        id: 6,
+        id: "mock-6",
         title: "Minimalist City Condo",
         price: 2900,
         location: "Wynwood, FL",
@@ -334,51 +334,53 @@ export default function BrowsePage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {filteredProperties.length > 0 ? (
                                     filteredProperties.map((property) => (
-                                        <div key={property.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full">
-                                            <div className="relative h-56 w-full overflow-hidden bg-gray-100">
-                                                <Image
-                                                    src={property.image}
-                                                    alt={property.title}
-                                                    fill
-                                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                />
-                                                <div className="absolute top-3 left-3 z-10">
-                                                    <FavoriteButton listingId={String(property.id)} />
-                                                </div>
-                                                <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-semibold text-gray-900 shadow-sm z-10">
-                                                    {property.type}
-                                                </div>
-                                            </div>
-                                            <div className="p-5 flex flex-col flex-1">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <div>
-                                                        <h3 className="font-semibold text-gray-900 text-lg leading-tight mb-1 group-hover:text-primary transition-colors">{property.title}</h3>
-                                                        <div className="flex items-center text-gray-500 text-sm gap-1">
-                                                            <MapPin size={14} className="text-gray-400" />
-                                                            {property.location}
-                                                        </div>
+                                        <Link href={`/listings/${property.id}`} key={property.id} className="block group h-full">
+                                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow group flex flex-col h-full">
+                                                <div className="relative h-56 w-full overflow-hidden bg-gray-100">
+                                                    <Image
+                                                        src={property.image}
+                                                        alt={property.title}
+                                                        fill
+                                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                    />
+                                                    <div className="absolute top-3 left-3 z-10" onClick={(e) => e.preventDefault()}>
+                                                        <FavoriteButton listingId={String(property.id)} />
+                                                    </div>
+                                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-semibold text-gray-900 shadow-sm z-10">
+                                                        {property.type}
                                                     </div>
                                                 </div>
+                                                <div className="p-5 flex flex-col flex-1">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <h3 className="font-semibold text-gray-900 text-lg leading-tight mb-1 group-hover:text-primary transition-colors">{property.title}</h3>
+                                                            <div className="flex items-center text-gray-500 text-sm gap-1">
+                                                                <MapPin size={14} className="text-gray-400" />
+                                                                {property.location}
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                                                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-gray-600 text-sm">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="flex items-center gap-1.5" title={`${property.bedrooms} Bedrooms`}>
-                                                            <Bed size={16} />
-                                                            <span>{property.bedrooms}</span>
+                                                    <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between text-gray-600 text-sm">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="flex items-center gap-1.5" title={`${property.bedrooms} Bedrooms`}>
+                                                                <Bed size={16} />
+                                                                <span>{property.bedrooms}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5" title={`${property.bathrooms} Bathrooms`}>
+                                                                <Bath size={16} />
+                                                                <span>{property.bathrooms}</span>
+                                                            </div>
                                                         </div>
-                                                        <div className="flex items-center gap-1.5" title={`${property.bathrooms} Bathrooms`}>
-                                                            <Bath size={16} />
-                                                            <span>{property.bathrooms}</span>
+                                                        <div className="text-right">
+                                                            <span className="text-lg font-bold text-primary">{property.price} XLM</span>
+                                                            <span className="text-xs text-gray-400 ml-1">/ mo</span>
                                                         </div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <span className="text-lg font-bold text-primary">{property.price} XLM</span>
-                                                        <span className="text-xs text-gray-400 ml-1">/ mo</span>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))
                                 ) : (
                                     <div className="col-span-full py-16 text-center text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">

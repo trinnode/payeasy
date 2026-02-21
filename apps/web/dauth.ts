@@ -17,12 +17,12 @@ const start = async ({
     email,
     password,
     username,
-    walletAddress,
+    public_key,
 }: {
     email: string;
     password: string;
     username: string;
-    walletAddress: string;
+    public_key: string;
 }) => {
     const { data: authData, error: authError } = await client.auth.signUp({
         email,
@@ -30,7 +30,7 @@ const start = async ({
         options: {
             data: {
                 username,
-                wallet_address: walletAddress,
+                public_key,
             },
         },
     });
@@ -39,7 +39,7 @@ const start = async ({
         id: authData.user!.id,
         username,
         email,
-        wallet_address: walletAddress,
+        public_key,
     }) : { data: null, error: new Error("No auth data") };
 
     console.table(error);
@@ -52,7 +52,7 @@ start({
     email: "mmyP6each1@example.com",
     username: '3@mmyP6esache',
     password: "password",
-    walletAddress: process.env.TEST_WALLET_ADDRESS!,
+    public_key: process.env.TEST_PUBLIC_KEY!,
 })
 
 export { }

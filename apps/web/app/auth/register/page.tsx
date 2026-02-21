@@ -8,7 +8,7 @@ import AuthButton from "@/components/forms/AuthButton";
 import AuthInput from "@/components/forms/AuthInput";
 import FormError from "@/components/forms/FormError";
 import Link from "next/link";
-import { createClient } from "@/lib/supabaseClient";
+import { createClient } from "@/lib/supabase/client";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

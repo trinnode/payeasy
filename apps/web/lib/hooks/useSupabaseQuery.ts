@@ -48,7 +48,7 @@ export function useSupabaseQuery<T>(
     }
 
     fetchData()
-  }, dependencies)
+  }, [table, query, ...(dependencies ?? [])])
 
   return { data, loading, error }
 }
