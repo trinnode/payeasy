@@ -10,7 +10,6 @@ import { Keypair } from "stellar-sdk";
 import * as crypto from "crypto";
 import * as jwt from "jsonwebtoken";
 
-// Mock crypto for deterministic tests
 jest.mock("crypto");
 jest.mock("jsonwebtoken");
 
@@ -185,19 +184,17 @@ describe("Timestamp Validation", () => {
   });
 
   it("should handle very large timestamp values", () => {
-    const veryFarFuture = Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 year ahead
+    const veryFarFuture = Date.now() + 365 * 24 * 60 * 60 * 1000;
     expect(isTimestampValid(veryFarFuture)).toBe(false);
   });
 
   it("should return false for zero timestamp when current time is not zero", () => {
-    // Current time is mocked to 1000000, so 0 is way outside 5 minute window
     expect(isTimestampValid(0)).toBe(false);
   });
 });
 
 describe("JWT Operations", () => {
   const mockToken = "mock.jwt.token";
-  // Use a properly formatted 56-character Stellar public key
   const validStellarKey =
     "GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H";
   const mockPayload = {
@@ -346,10 +343,10 @@ describe("JWT Operations", () => {
       it("should return null when sub is not a valid Stellar public key format", () => {
         const invalidPayloads = [
           { sub: "INVALID_KEY" },
-          { sub: "XABC123" }, // Wrong prefix
-          { sub: "G123" }, // Too short
-          { sub: "GABC!" }, // Invalid character
-          { sub: "gabc" + "a".repeat(52) }, // Lowercase
+          { sub: "XABC123" },
+          { sub: "G123" },
+          { sub: "GABC!" },
+          { sub: "gabc" + "a".repeat(52) },
         ];
 
         invalidPayloads.forEach((invalidPayload) => {
@@ -441,7 +438,6 @@ describe("JWT Operations", () => {
       });
 
       it("should validate Stellar public key checksum format", () => {
-        // These are properly formatted Stellar keys (56 chars, starts with G, base32 A-Z2-7)
         const validKeys = [
           "GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H",
           "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",

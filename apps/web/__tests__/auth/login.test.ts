@@ -1,7 +1,6 @@
 import { POST } from "@/app/api/auth/login/route";
 import { Keypair } from "stellar-sdk";
 
-// Mock Stellar SDK
 jest.mock("stellar-sdk", () => ({
   Keypair: {
     fromPublicKey: jest.fn(),
@@ -15,7 +14,6 @@ describe("POST /api/auth/login", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Mock keypair with required methods
     testKeypair = {
       publicKey: () => "GDUMMYPUBLICKEY123456789",
       sign: jest.fn(),

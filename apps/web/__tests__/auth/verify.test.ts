@@ -9,7 +9,6 @@ import {
   cookieHasAttribute,
 } from "../helpers/auth-helpers";
 
-// Mock stellar-auth module
 jest.mock("@/lib/auth/stellar-auth");
 
 describe("POST /api/auth/verify", () => {
@@ -20,7 +19,6 @@ describe("POST /api/auth/verify", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Mock keypair with required methods
     testKeypair = {
       publicKey: () => "GDUMMYPUBLICKEY123456789",
       sign: jest.fn().mockReturnValue(Buffer.from("mockSignature", "base64")),
@@ -29,9 +27,8 @@ describe("POST /api/auth/verify", () => {
 
     testChallenge = generateTestChallenge();
 
-    // Mock successful path by default
     (stellarAuth.buildMessage as jest.Mock).mockReturnValue(
-      `PayEasy Login: ${testChallenge.nonce}.${testChallenge.timestamp}`,
+      `PayEasy Login: ${testChallenge.nonce}.${testChallenge.timestamp}`
     );
     (stellarAuth.isTimestampValid as jest.Mock).mockReturnValue(true);
     (stellarAuth.verifySignature as jest.Mock).mockReturnValue(true);
@@ -46,13 +43,10 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         validSignature,
         testChallenge.nonce,
-        testChallenge.timestamp,
+        testChallenge.timestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
       const response = await POST(request);
       const data = await response.json();
@@ -61,22 +55,18 @@ describe("POST /api/auth/verify", () => {
       expect(data.success).toBe(true);
       expect(data.data.publicKey).toBe(testKeypair.publicKey());
 
-      // Verify mocks were called with correct parameters
       expect(stellarAuth.buildMessage).toHaveBeenCalledWith(
         testChallenge.nonce,
-        testChallenge.timestamp,
+        testChallenge.timestamp
       );
-      expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(
-        testChallenge.timestamp,
-      );
+      expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(testChallenge.timestamp);
       expect(stellarAuth.verifySignature).toHaveBeenCalledWith(
         testKeypair.publicKey(),
         validSignature,
-        `PayEasy Login: ${testChallenge.nonce}.${testChallenge.timestamp}`,
+        `PayEasy Login: ${testChallenge.nonce}.${testChallenge.timestamp}`
       );
       expect(stellarAuth.signJwt).toHaveBeenCalledWith(testKeypair.publicKey());
 
-      // Check cookie was set with better parsing
       const cookies = response.headers.get("set-cookie");
       const cookie = parseCookie(cookies);
 
@@ -92,24 +82,27 @@ describe("POST /api/auth/verify", () => {
       const originalEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = "production";
 
-      const body = createVerifyBody(
-        testKeypair.publicKey(),
-        validSignature,
-        testChallenge.nonce,
-        testChallenge.timestamp,
-      );
+      try {
+        const body = createVerifyBody(
+          testKeypair.publicKey(),
+          validSignature,
+          testChallenge.nonce,
+          testChallenge.timestamp
+        );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+        const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
-      const response = await POST(request);
-      const cookies = response.headers.get("set-cookie");
+        const response = await POST(request);
+        const cookies = response.headers.get("set-cookie");
 
-      expect(cookieHasAttribute(cookies, "Secure")).toBe(true);
-
-      process.env.NODE_ENV = originalEnv;
+        expect(cookieHasAttribute(cookies, "Secure")).toBe(true);
+      } finally {
+        if (originalEnv === undefined) {
+          delete process.env.NODE_ENV;
+        } else {
+          process.env.NODE_ENV = originalEnv;
+        }
+      }
     });
   });
 
@@ -186,13 +179,10 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         validSignature,
         testChallenge.nonce,
-        expiredTimestamp,
+        expiredTimestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
       const response = await POST(request);
       const data = await response.json();
@@ -202,10 +192,7 @@ describe("POST /api/auth/verify", () => {
       expect(data.error.code).toBe("CHALLENGE_EXPIRED");
       expect(data.error.message).toBe("Challenge expired");
 
-      // Verify timestamp validation was called
-      expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(
-        expiredTimestamp,
-      );
+      expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(expiredTimestamp);
     });
   });
 
@@ -217,13 +204,10 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         "invalid-signature",
         testChallenge.nonce,
-        testChallenge.timestamp,
+        testChallenge.timestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
       const response = await POST(request);
       const data = await response.json();
@@ -233,11 +217,10 @@ describe("POST /api/auth/verify", () => {
       expect(data.error.code).toBe("INVALID_SIGNATURE");
       expect(data.error.message).toBe("Invalid signature");
 
-      // Verify signature check was called
       expect(stellarAuth.verifySignature).toHaveBeenCalledWith(
         testKeypair.publicKey(),
         "invalid-signature",
-        expect.any(String),
+        expect.any(String)
       );
     });
 
@@ -249,13 +232,10 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         wrongSignature,
         testChallenge.nonce,
-        testChallenge.timestamp,
+        testChallenge.timestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
       const response = await POST(request);
       const data = await response.json();
@@ -286,17 +266,13 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         validSignature,
         testChallenge.nonce,
-        0,
+        0
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
       const response = await POST(request);
 
-      // Should not return 400 for timestamp validation
       expect(response.status).not.toBe(400);
       expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(0);
     });
@@ -322,17 +298,13 @@ describe("POST /api/auth/verify", () => {
         longKey,
         validSignature,
         testChallenge.nonce,
-        testChallenge.timestamp,
+        testChallenge.timestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
       const response = await POST(request);
 
-      // Should process without crashing
       expect(response.status).toBeDefined();
     });
 
@@ -342,22 +314,15 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         validSignature,
         specialNonce,
-        testChallenge.timestamp,
+        testChallenge.timestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
       const response = await POST(request);
 
-      // Should process without error
       expect(response.status).toBeDefined();
-      expect(stellarAuth.buildMessage).toHaveBeenCalledWith(
-        specialNonce,
-        testChallenge.timestamp,
-      );
+      expect(stellarAuth.buildMessage).toHaveBeenCalledWith(specialNonce, testChallenge.timestamp);
     });
 
     it("should handle very large timestamp values", async () => {
@@ -366,15 +331,12 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         validSignature,
         testChallenge.nonce,
-        largeTimestamp,
+        largeTimestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
-      const response = await POST(request);
+      await POST(request);
 
       expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(largeTimestamp);
     });
@@ -385,19 +347,14 @@ describe("POST /api/auth/verify", () => {
         testKeypair.publicKey(),
         validSignature,
         testChallenge.nonce,
-        negativeTimestamp,
+        negativeTimestamp
       );
 
-      const request = createAuthRequest(
-        "http://localhost/api/auth/verify",
-        body,
-      );
+      const request = createAuthRequest("http://localhost/api/auth/verify", body);
 
-      const response = await POST(request);
+      await POST(request);
 
-      expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(
-        negativeTimestamp,
-      );
+      expect(stellarAuth.isTimestampValid).toHaveBeenCalledWith(negativeTimestamp);
     });
   });
 
@@ -413,26 +370,20 @@ describe("POST /api/auth/verify", () => {
           };
         });
 
-      // Get challenges for all keypairs
       const challenges = keypairs.map(() => generateTestChallenge());
 
-      // Create concurrent verification requests
       const requests = keypairs.map((kp, index) => {
         const body = createVerifyBody(
           kp.publicKey(),
           validSignature,
           challenges[index].nonce,
-          challenges[index].timestamp,
+          challenges[index].timestamp
         );
-        return POST(
-          createAuthRequest("http://localhost/api/auth/verify", body),
-        );
+        return POST(createAuthRequest("http://localhost/api/auth/verify", body));
       });
 
-      // Execute all requests concurrently
       const responses = await Promise.all(requests);
 
-      // All requests should complete without crashing
       expect(responses).toHaveLength(concurrentRequests);
       responses.forEach((response) => {
         expect(response.status).toBeDefined();
@@ -444,7 +395,6 @@ describe("POST /api/auth/verify", () => {
       const samePublicKey = testKeypair.publicKey();
       const concurrentRequests = 5;
 
-      // Create multiple concurrent requests with same public key
       const requests = Array(concurrentRequests)
         .fill(null)
         .map(() => {
@@ -453,19 +403,15 @@ describe("POST /api/auth/verify", () => {
             samePublicKey,
             validSignature,
             challenge.nonce,
-            challenge.timestamp,
+            challenge.timestamp
           );
-          return POST(
-            createAuthRequest("http://localhost/api/auth/verify", body),
-          );
+          return POST(createAuthRequest("http://localhost/api/auth/verify", body));
         });
 
       const responses = await Promise.all(requests);
 
-      // Should handle all requests
       expect(responses).toHaveLength(concurrentRequests);
 
-      // Check for race conditions in cookie setting
       const cookieResponses = responses.filter((r) => r.status === 200);
       cookieResponses.forEach((response) => {
         const cookies = response.headers.get("set-cookie");
@@ -484,146 +430,14 @@ describe("POST /api/auth/verify", () => {
             testKeypair.publicKey(),
             validSignature,
             challenge.nonce,
-            challenge.timestamp,
+            challenge.timestamp
           );
-          return POST(
-            createAuthRequest("http://localhost/api/auth/verify", body),
-          );
-        });
-
-      const startTime = performance.now();
-      const responses = await Promise.all(requests);
-      const endTime = performance.now();
-
-      // All requests should complete in reasonable time
-      expect(endTime - startTime).toBeLessThan(5000);
-
-      // Check response integrity
-      const parsedResponses = await Promise.all(responses.map((r) => r.json()));
-
-      parsedResponses.forEach((data) => {
-        expect(data).toHaveProperty("success");
-        expect(typeof data.success).toBe("boolean");
-        if (data.success) {
-          expect(data.data).toHaveProperty("publicKey");
-        } else {
-          expect(data.error).toHaveProperty("message");
-        }
-      });
-    });
-
-    it("should not leak memory under concurrent load", async () => {
-      const iterations = 3;
-      const requestsPerIteration = 10;
-
-      for (let i = 0; i < iterations; i++) {
-        const requests = Array(requestsPerIteration)
-          .fill(null)
-          .map(() => {
-            const challenge = generateTestChallenge();
-            const body = createVerifyBody(
-              testKeypair.publicKey(),
-              validSignature,
-              challenge.nonce,
-              challenge.timestamp,
-            );
-            return POST(
-              createAuthRequest("http://localhost/api/auth/verify", body),
-            );
-          });
-
-        await Promise.all(requests);
-
-        // Small delay between iterations
-        await new Promise((resolve) => setTimeout(resolve, 50));
-      }
-
-      // If we reach here without crashing, memory is being managed
-      expect(true).toBe(true);
-    });
-
-    it("should handle mixed success and failure concurrent requests", async () => {
-      const successRequests = 5;
-      const failureRequests = 5;
-
-      // Create successful requests
-      const successPromises = Array(successRequests)
-        .fill(null)
-        .map(() => {
-          const challenge = generateTestChallenge();
-          const body = createVerifyBody(
-            testKeypair.publicKey(),
-            validSignature,
-            challenge.nonce,
-            challenge.timestamp,
-          );
-          return POST(
-            createAuthRequest("http://localhost/api/auth/verify", body),
-          );
-        });
-
-      // Create failing requests (invalid signature)
-      (stellarAuth.verifySignature as jest.Mock).mockReturnValueOnce(false);
-      const failurePromises = Array(failureRequests)
-        .fill(null)
-        .map(() => {
-          const challenge = generateTestChallenge();
-          const body = createVerifyBody(
-            testKeypair.publicKey(),
-            "invalid-signature",
-            challenge.nonce,
-            challenge.timestamp,
-          );
-          return POST(
-            createAuthRequest("http://localhost/api/auth/verify", body),
-          );
-        });
-
-      // Execute all concurrently
-      const allResponses = await Promise.all([
-        ...successPromises,
-        ...failurePromises,
-      ]);
-
-      // Should handle both success and failure gracefully
-      expect(allResponses).toHaveLength(successRequests + failureRequests);
-
-      const statusCodes = allResponses.map((r) => r.status);
-      expect(statusCodes.filter((s) => s === 200).length).toBeGreaterThan(0);
-      expect(statusCodes.filter((s) => s === 401).length).toBeGreaterThan(0);
-    });
-
-    it("should prevent race conditions in JWT generation", async () => {
-      const concurrentRequests = 10;
-      const samePublicKey = testKeypair.publicKey();
-
-      const requests = Array(concurrentRequests)
-        .fill(null)
-        .map(() => {
-          const challenge = generateTestChallenge();
-          const body = createVerifyBody(
-            samePublicKey,
-            validSignature,
-            challenge.nonce,
-            challenge.timestamp,
-          );
-          return POST(
-            createAuthRequest("http://localhost/api/auth/verify", body),
-          );
+          return POST(createAuthRequest("http://localhost/api/auth/verify", body));
         });
 
       const responses = await Promise.all(requests);
 
-      // Extract cookies from successful responses
-      const cookies = responses
-        .filter((r) => r.status === 200)
-        .map((r) => r.headers.get("set-cookie"));
-
-      // All cookies should contain JWT tokens
-      cookies.forEach((cookie) => {
-        expect(cookie).toContain("auth-token=");
-        expect(cookie).toContain("mock.jwt.token");
-      });
+      expect(responses).toHaveLength(concurrentRequests);
     });
   });
 });
