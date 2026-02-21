@@ -22,11 +22,57 @@ export async function POST(request: Request) {
 
         // --- Input validation ------------------------------------------------
 
-        if (!publicKey || !signature || !nonce || timestamp == null) {
+        if (!publicKey) {
             return NextResponse.json(
                 {
                     success: false,
-                    error: { message: "publicKey, signature, nonce, and timestamp are required" },
+                    error: { 
+                        code: "MISSING_FIELD",
+                        message: "Missing required field: publicKey",
+                        field: "publicKey"
+                    },
+                },
+                { status: 400 }
+            );
+        }
+
+        if (!signature) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: { 
+                        code: "MISSING_FIELD",
+                        message: "Missing required field: signature",
+                        field: "signature"
+                    },
+                },
+                { status: 400 }
+            );
+        }
+
+        if (!nonce) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: { 
+                        code: "MISSING_FIELD",
+                        message: "Missing required field: nonce",
+                        field: "nonce"
+                    },
+                },
+                { status: 400 }
+            );
+        }
+
+        if (timestamp == null) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: { 
+                        code: "MISSING_FIELD",
+                        message: "Missing required field: timestamp",
+                        field: "timestamp"
+                    },
                 },
                 { status: 400 }
             );
@@ -38,7 +84,11 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    error: { message: "Challenge expired. Please request a new login challenge." },
+                    error: { 
+                        code: "CHALLENGE_EXPIRED",
+                        message: "Challenge expired",
+                        timestamp
+                    },
                 },
                 { status: 401 }
             );
@@ -53,7 +103,10 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    error: { message: "Invalid signature" },
+                    error: { 
+                        code: "INVALID_SIGNATURE",
+                        message: "Invalid signature" 
+                    },
                 },
                 { status: 401 }
             );
@@ -80,7 +133,13 @@ export async function POST(request: Request) {
         return response;
     } catch {
         return NextResponse.json(
-            { success: false, error: { message: "Internal server error" } },
+            { 
+                success: false, 
+                error: { 
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Internal server error" 
+                } 
+            },
             { status: 500 }
         );
     }

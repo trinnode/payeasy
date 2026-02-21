@@ -15,7 +15,14 @@ export async function POST(request: Request) {
 
         if (!publicKey || typeof publicKey !== "string") {
             return NextResponse.json(
-                { success: false, error: { message: "publicKey is required" } },
+                { 
+                    success: false, 
+                    error: { 
+                        code: "MISSING_FIELD",
+                        message: "publicKey is required",
+                        field: "publicKey"
+                    } 
+                },
                 { status: 400 }
             );
         }
@@ -25,7 +32,14 @@ export async function POST(request: Request) {
             Keypair.fromPublicKey(publicKey);
         } catch {
             return NextResponse.json(
-                { success: false, error: { message: "Invalid Stellar public key" } },
+                { 
+                    success: false, 
+                    error: { 
+                        code: "INVALID_PUBLIC_KEY",
+                        message: "Invalid Stellar public key",
+                        field: "publicKey"
+                    } 
+                },
                 { status: 400 }
             );
         }
@@ -38,7 +52,13 @@ export async function POST(request: Request) {
         });
     } catch {
         return NextResponse.json(
-            { success: false, error: { message: "Internal server error" } },
+            { 
+                success: false, 
+                error: { 
+                    code: "INTERNAL_SERVER_ERROR",
+                    message: "Internal server error" 
+                } 
+            },
             { status: 500 }
         );
     }
