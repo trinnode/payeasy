@@ -16,7 +16,6 @@
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
         "test:perf": "jest __tests__/performance/ --passWithNoTests",
-        "test:vitest": "vitest run",
         "lh:ci": "lhci autorun",
         "analyze": "ANALYZE=true next build",
         "bundle:check": "node lib/bundle/check-size.mjs"
