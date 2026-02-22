@@ -92,7 +92,7 @@ class PrefetchManager {
 
     setInterval(() => {
       const now = Date.now();
-      for (const [key, entry] of this.cache.entries()) {
+      for (const [key, entry] of Array.from(this.cache.entries())) {
         if (now - entry.timestamp > entry.ttl) {
           this.cache.delete(key);
         }
@@ -174,7 +174,8 @@ class PrefetchManager {
 
     // Return existing pending request
     if (this.pendingRequests.has(url)) {
-      return this.pendingRequests.get(url);
+      await this.pendingRequests.get(url);
+      return;
     }
 
     this.metrics.totalPrefetches++;
