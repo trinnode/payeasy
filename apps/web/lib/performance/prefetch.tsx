@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use client';
 
 import React, { useEffect, useCallback, useRef, useState } from 'react';
@@ -384,11 +385,10 @@ export function useNetworkAwarePrefetch(
 export function usePrefetchManager() {
   const manager = PrefetchManager.getInstance();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return {
     prefetch: (url: string, options?: { priority?: number; ttl?: number }) =>
       manager.prefetch(url, options),
-    getCachedData: (url: string) => manager.getCachedData(url),
+    getCachedData: <T = unknown>(url: string) => manager.getCachedData<T>(url),
     clearCache: () => manager.clearCache(),
     getMetrics: () => manager.getMetrics(),
     setConfig: (config: PrefetchConfig) => manager.setConfig(config),

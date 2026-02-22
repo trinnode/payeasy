@@ -47,7 +47,7 @@ export function CachedDataComponent() {
   const { getCachedData, prefetch } = usePrefetchManager();
 
   // Try to get cached data from a previous prefetch
-  const cachedListings = getCachedData<unknown>('/api/listings');
+  const cachedListings = getCachedData('/api/listings');
 
   return (
     <div>
