@@ -1,28 +1,37 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-export function createServerClient() {
+export async function createClient() {
+  const cookieStore = await cookies();
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error(
-      "Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"
-    );
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn("Missing Supabase environment variables. Using empty strings for build purposes.");
   }
 
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  return createServerClient(
+    supabaseUrl || "http://localhost:54321",
+    supabaseKey || "dummy_key",
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch { }
+        },
+      },
+    }
+  );
 }
 
-let serverClient: SupabaseClient | null = null;
-
-export function getServerClient() {
-  if (!serverClient) {
-    serverClient = createServerClient();
-  }
-  return serverClient;
+export async function getServerClient() {
+  return createClient();
 }

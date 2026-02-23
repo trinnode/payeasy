@@ -2,6 +2,7 @@
 node_modules
 .pnp
 .pnp.js
+.temp
 
 # Testing
 coverage
@@ -10,6 +11,7 @@ coverage
 .next/
 out/
 build/
+*.tsbuildinfo
 
 # Soroban / Rust
 target/
@@ -32,6 +34,9 @@ yarn-error.log*
 .idea
 *.swp
 *.swo
+
+# Claude Code
+.claude/
 
 # OS
 .DS_Store
