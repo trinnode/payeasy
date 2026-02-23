@@ -369,6 +369,9 @@ export default function BrowsePage() {
                                     <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         Dashboard
                                     </Link>
+                                    <Link href="/payments/history" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        Payment History
+                                    </Link>
                                     <Link href="/auth/login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                         Login
                                     </Link>

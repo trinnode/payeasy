@@ -38,6 +38,7 @@
         "bidi-js": "^1.0.0",
         "clsx": "^2.0.0",
         "jsonwebtoken": "^9.0.3",
+        "jspdf": "^4.2.0",
         "lodash.debounce": "^4.0.8",
         "lucide-react": "^0.294.0",
         "mapbox-gl": "^3.18.1",

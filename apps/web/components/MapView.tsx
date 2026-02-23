@@ -296,14 +296,12 @@ export default function MapView({
                     <ListingPopup
                         listing={{
                             id: selectedListing.id,
-                            price: selectedListing.price,
                             title: selectedListing.title || 'Untitled Listing',
+                            price: selectedListing.price,
                             location: selectedListing.location || 'Unknown Location',
                             bedrooms: selectedListing.bedrooms || 0,
                             bathrooms: selectedListing.bathrooms || 0,
-                            image: selectedListing.image || '/images/placeholder.jpg',
-                            // Preserve any other properties if they match ListingPopupData
-                            ...(selectedListing as Partial<ListingPopupData>)
+                            image: selectedListing.image || '/images/airbnb1.jpg',
                         }}
                         onClose={() => setSelectedListing(null)}
                     />
