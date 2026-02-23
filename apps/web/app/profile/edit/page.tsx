@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import useAuth from "../../../lib/hooks/useAuth";
 import { createBrowserClient } from "../../../lib/supabase/client";
-import Image from 'next/image';
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -95,7 +94,7 @@ export default function EditProfilePage() {
           <input id="avatar" type="file" accept="image/*" onChange={handleFileChange} className="mt-1 w-full text-sm text-gray-300" aria-describedby={uploading ? "avatar-uploading" : undefined} />
           {uploading && <div id="avatar-uploading" className="text-xs text-gray-400 mt-2" aria-live="polite">Uploading…</div>}
           {avatarUrl && (
-            <div className="mt-2 relative w-20 h-20 rounded-full overflow-hidden">
+            <div className="mt-2 relative w-20 h-20 rounded-full overflow-hidden border border-white/10">
               <Image 
                 src={avatarUrl} 
                 alt={`${user?.username || 'User'} avatar preview`} 
