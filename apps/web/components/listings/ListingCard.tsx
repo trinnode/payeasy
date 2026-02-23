@@ -3,14 +3,17 @@
 import Image from 'next/image'
 import { MapPin, Bed, Bath } from 'lucide-react'
 import FavoriteButton from '../FavoriteButton'
+import { CompareButtonIcon } from '../CompareButton'
 import type { Listing } from '../../lib/db/types'
 import Link from 'next/link'
 
 interface ListingCardProps {
     listing: Listing
+    /** Hide comparison button (e.g., on comparison page) */
+    hideCompare?: boolean
 }
 
-export default function ListingCard({ listing }: ListingCardProps) {
+export default function ListingCard({ listing, hideCompare = false }: ListingCardProps) {
     // Use the first image from the array or fallback
     const imageUrl = listing.images && listing.images.length > 0 
         ? listing.images[0] 
@@ -27,8 +30,11 @@ export default function ListingCard({ listing }: ListingCardProps) {
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
-                    <div className="absolute top-3 left-3 z-10" onClick={(e) => e.preventDefault()}>
+                    <div className="absolute top-3 left-3 z-10 flex items-center gap-2" onClick={(e) => e.preventDefault()}>
                         <FavoriteButton listingId={listing.id} />
+                        {!hideCompare && (
+                            <CompareButtonIcon listing={listing as Listing & { images?: string[] }} />
+                        )}
                     </div>
                 </div>
                 <div className="p-5 flex flex-col flex-1">
