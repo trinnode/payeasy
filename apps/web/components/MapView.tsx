@@ -12,6 +12,8 @@ import Supercluster from 'supercluster'
 import debounce from 'lodash.debounce'
 import ListingPopup from './ListingPopup'
 import type { ListingPopupData } from './ListingPopup'
+import { trackEvent } from '@/lib/analytics/tracking'
+import { AnalyticsEventName } from '@/lib/analytics/events'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 export interface MapListing extends Partial<ListingPopupData> {
@@ -182,6 +184,11 @@ export default function MapView({
             zoom,
             duration: 500,
         })
+        trackEvent(AnalyticsEventName.BUTTON_CLICK, {
+            button_id: 'map_cluster',
+            text: `Zoomed into cluster with ${clusterId}`,
+            location: 'map_view',
+        })
     }
 
     if (!mounted) {
@@ -273,7 +280,14 @@ export default function MapView({
                                     ? 'bg-primary text-white scale-110'
                                     : 'bg-white text-primary border border-gray-200'
                                 }`}
-                            onClick={() => setSelectedListing(listing)}
+                            onClick={() => {
+                                setSelectedListing(listing)
+                                trackEvent(AnalyticsEventName.BUTTON_CLICK, {
+                                    button_id: `listing_marker_${listing.id}`,
+                                    text: `Viewed listing: ${listing.title}`,
+                                    location: 'map_view',
+                                })
+                            }}
                         >
                             {listing.price} XLM
                         </div>
