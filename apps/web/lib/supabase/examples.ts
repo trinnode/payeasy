@@ -385,7 +385,7 @@ export async function POST(req: NextRequest) {
 // ──────────────────────────────────────────────────────────────────────────
 
 /*
-import { getAdminClient, handleSupabaseMutation } from '@/lib/supabase'
+import { createAdminClient, handleSupabaseMutation } from '@/lib/supabase'
 import { NextRequest, NextResponse } from 'next/server'
 
 // ⚠️ IMPORTANT: This endpoint should have proper authorization checks!
@@ -399,7 +399,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const admin = getAdminClient()
+  const admin = createAdminClient()
 
   try {
     // Admin client bypasses RLS - can delete any listing
@@ -425,14 +425,14 @@ export async function DELETE(
 // ──────────────────────────────────────────────────────────────────────────
 
 /*
-import { getAdminClient } from '@/lib/supabase'
+import { createAdminClient } from '@/lib/supabase'
 import type { ListingInsert, RentAgreementInsert } from '@/lib/types'
 
 export async function createListingWithAgreement(
   listing: ListingInsert,
   agreement: RentAgreementInsert
 ) {
-  const admin = getAdminClient()
+  const admin = createAdminClient()
 
   try {
     // Insert listing

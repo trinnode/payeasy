@@ -44,7 +44,14 @@ export interface ConversationPreview {
   participants: {
     id: string;
     user_id: string;
+    username?: string;
+    avatar_url?: string;
   }[];
+  unread_count: number;
+  other_user?: {
+    username: string;
+    avatar_url: string;
+  };
 }
 
 export interface PaginatedResponse<T> {

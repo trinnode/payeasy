@@ -26,7 +26,6 @@ export {
 // Server (API routes, Server Components)
 export {
   createClient as createServerClient,
-  getServerClient,
 } from './server'
 
 // Admin

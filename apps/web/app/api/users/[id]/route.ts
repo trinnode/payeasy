@@ -2,21 +2,34 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getUserId, successResponse, errorResponse } from "@/lib/api-utils";
 import { createClient } from "@/lib/supabase/server";
 import { userUpdateSchema } from "@/lib/types/validation";
-import { getMockUserById } from "@/lib/mock/users";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  try {
+    const { id: idParam } = await params;
 
-  // Simulate artificial delay for mock data
-  await new Promise((resolve) => setTimeout(resolve, 800));
+    const supabase = await createClient();
 
-  const mockData = getMockUserById(id);
+    let targetId: string | null = null;
+    if (idParam === "me") {
+      targetId = getUserId(request) as string | null;
+      if (!targetId) return errorResponse("Unauthorized", 401);
+    } else {
+      targetId = idParam;
+    }
 
-  if (!mockData) {
-    return errorResponse("User not found", 404);
+    const { data: user, error: userErr } = await supabase
+      .from("users")
+      .select("id,username,email,public_key,avatar_url,bio,created_at")
+      .eq("id", targetId)
+      .maybeSingle();
+
+    if (userErr) return errorResponse(userErr.message, 400);
+    if (!user) return errorResponse("User not found", 404);
+
+    return successResponse(user);
+  } catch (err) {
+    return errorResponse("Internal server error", 500);
   }
-
-  return successResponse(mockData);
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -75,52 +88,52 @@ export async function PUT(
   try {
     const { id } = await params;
     const supabase = await createClient();
-    
+
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    
+
     // Check if the user is updating their own profile
     if (user.id !== id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await request.json();
 
     // Validate request body
     const validationResult = userUpdateSchema.safeParse(body);
-    
+
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: validationResult.error.flatten() },
+        { error: "Validation failed", details: validationResult.error.flatten() },
         { status: 400 }
       );
     }
-    
+
     // Update the user profile in the database
     const { data, error } = await supabase
-      .from('users')
+      .from("users")
       .update(validationResult.data)
-      .eq('id', id)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      console.error('Failed to update user profile:', error);
+      console.error("Failed to update user profile:", error);
       return NextResponse.json(
-        { error: 'Failed to update profile' },
+        { error: "Failed to update profile" },
         { status: 500 }
       );
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Unexpected error in PUT /api/users/[id]:', error);
+    console.error("Unexpected error in PUT /api/users/[id]:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

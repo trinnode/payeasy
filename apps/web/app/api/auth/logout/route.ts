@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getUserId } from "@/lib/api-utils";
 import { logAuthEvent, AuthEventType } from "@/lib/security/authLogging";
 
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
   );
 
   // Clear the auth-token cookie by setting it with maxAge: 0
-  response.cookies.set("auth-token", "", {
+  cookies().set("auth-token", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
